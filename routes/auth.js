@@ -9,7 +9,6 @@ const { authServer } = require('../config/default');
 router.post('/', async (req, res) => {
   try {
     let response;
-    const token = req.header('x-auth-token');
     switch (req.body.action) {
       case 'registerUser':
         response = await registerUser(req.body.reqBody);
@@ -19,10 +18,10 @@ router.post('/', async (req, res) => {
         break;
       case 'registerProfile':
         //const token = req.header('x-auth-token');
-        response = await registerProfile(token);
+        response = await registerProfile(req);
         break;
       case 'getCurrentProfile':
-        response = await getCurrentProfile(token, req.body.reqBody);
+        response = await getCurrentProfile(req);
         break;
       default:
         return res.status(404).json({ errors: { action: 'Invalid request' } });
@@ -39,7 +38,7 @@ const registerUser = async (body) => {
   console.log('gateway action registerUser');
   try {
     const response = await axios.post(`${authServer}/api/users/`, body);
-    console.log('response from service');
+    //console.log('response from service');
     return response;
   } catch (error) {
     console.error(error.response.data);
@@ -58,18 +57,13 @@ const loginUser = async (body) => {
   }
 };
 
-const registerProfile = async (token, body) => {
-  //const token = req.header('x-auth-token');
-  //const token = req.get('x-auth-token');
-
-  //console.log(token);
-  //console.log('gateway action registerProfile');
+const registerProfile = async (req) => {
+  const token = req.header('x-auth-token');
   // Decide if token is confirmed here or on microservice
   try {
-    const response = await axios.post(`${authServer}/api/profiles`, body, {
+    const response = await axios.post(`${authServer}/api/profiles`, req.body.reqBody, {
       headers: { 'x-auth-token': token },
     });
-    //console.log(response);
     return response;
   } catch (error) {
     console.error(error.response.data);
@@ -78,7 +72,6 @@ const registerProfile = async (token, body) => {
 };
 
 const getCurrentProfile = async (token) => {
-  //const token = req.header('x-auth-token');
   try {
     const response = await axios.get(`${authServer}/api/profiles/self/`, {
       headers: { 'x-auth-token': token },

@@ -13,6 +13,10 @@ const port = process.env.PORT || 6000;
 
 app.listen(port, () => console.log(`App listening on port ${port}`));
 
+// Post /api/auth
+// Post /api/posts
+// Post /api/comrev
+
 // Gateway >> auth microservice
 // Frontend >> gateway >> authservice
 
